@@ -1,19 +1,47 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
+class FilmRow extends React.Component {
+  render() {
+    const film = this.props.film;
+
+    return (
+      <tr>
+        <td>{film.title}</td>
+      </tr>
+    );
+  }
+}
+
 class FilmsTable extends React.Component {
   render() {
-    console.log(this.props.categoryName);
+    const category = this.props.category;
+    let categoryHeadText = "";
+    const filmRows = [];
+
+    if (category != null) {
+      categoryHeadText = category.name;
+      this.props.films.forEach((film) => {
+        if (film.category[0].name == categoryHeadText) {
+          filmRows.push(
+            <FilmRow
+              film={film}
+              key={film.filmId + film.title}
+              //onClick={(i) => this.props.onClick(category)}
+            />
+          );
+        }
+      });
+    }
     return (
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th>{this.categoryName}</th>
-            </tr>
-          </thead>
-        </table>
-      </div>
+      <table id="FilmsTable">
+        <thead>
+          <tr>
+            <th>{categoryHeadText}</th>
+          </tr>
+        </thead>
+        <tbody>{filmRows}</tbody>
+      </table>
     );
   }
 }
@@ -52,7 +80,7 @@ class CategorysTable extends React.Component {
     });
 
     return (
-      <table>
+      <table id="categorysTable">
         <thead>
           <tr>
             <th id="movieCategoriesHead">Movie Categories</th>
@@ -71,24 +99,40 @@ class MainPage extends React.Component {
     this.state = {
       categoryClicked: false,
       category: {},
+      //for importing data from server
+      categorysData: null,
     };
+  }
+
+  //getting the data from your server
+  componentDidMount() {
+    fetch("http://3.85.85.10:8080/Home/AllCategorys")
+      .then((response) => response.json())
+      .then((jsonData) => {
+        const importCategorysData = jsonData.result;
+        this.setState({
+          categorysData: importCategorysData,
+        });
+      });
+  }
+
+  componentDidUpdate(categorysData) {
+    console.log(categorysData);
   }
 
   handleCategoryClick(filmCategory) {
     this.setState({ categoryClicked: true });
     this.setState({ category: filmCategory });
-
-    console.log(this.state.category);
   }
 
   render() {
-    const categoryClicked = this.categoryClicked;
+    const categoryClicked = this.state.categoryClicked;
     let filmCategory;
 
-    //unsure if this
     if (categoryClicked) {
-      console.log(this.category);
-      filmCategory = <FilmsTable category={this.category} />;
+      filmCategory = (
+        <FilmsTable films={this.props.films} category={this.state.category} />
+      );
     }
 
     return (
@@ -319,6 +363,6 @@ const Films = [
 ];
 
 ReactDOM.render(
-  <MainPage categorys={Categorys} />,
+  <MainPage categorys={Categorys} films={Films} />,
   document.getElementById("root")
 );
