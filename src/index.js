@@ -189,7 +189,7 @@ class AddCategory extends React.Component {
     this.changeCategoryHandler = this.changeCategoryHandler.bind(this);
     this.saveCategory = this.saveCategory.bind(this);
   }
-  //test
+
   saveCategory = (e) => {
     e.preventDefault();
     let name = {
@@ -198,7 +198,7 @@ class AddCategory extends React.Component {
     console.log("category => " + JSON.stringify(name));
 
     axios
-      .post("http://100.24.41.32:8080/Home/AddCategory?name=" + this.state.name)
+      .post("http://52.91.66.39:8080/Home/AddCategory?name=" + this.state.name)
       .then((res) => {
         console.log(res);
       });
@@ -213,7 +213,6 @@ class AddCategory extends React.Component {
   }
 
   render() {
-    console.log("add");
     return (
       <div className="addCategoryform">
         <form>
@@ -244,7 +243,42 @@ class AddCategory extends React.Component {
 }
 
 class DeleteCategory extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: "",
+    };
+    this.changeCategoryHandler = this.changeCategoryHandler.bind(this);
+    this.deleteCategory = this.deleteCategory.bind(this);
+  }
+
+  changeCategoryHandler(event) {
+    this.setState({ name: event.target.value });
+  }
+
+  cancel() {
+    this.props.history.push("/DeleteCategory");
+  }
+
+  deleteCategory = (e) => {
+    e.preventDefault();
+
+    this.props.allCategorys.forEach((category) => {
+      if (category.name.toLowerCase() === this.state.name.toLowerCase()) {
+        axios
+          .delete(
+            "http://52.91.66.39:8080/Home/DeleteCategory/" + category.categoryId
+          )
+          .then((res) => {
+            console.log(res);
+          });
+      }
+    });
+  };
+
   render() {
+    //const categorys = this.props.allCategorys;
+
     return (
       <div className="deleteCategoryform">
         <form>
@@ -254,16 +288,16 @@ class DeleteCategory extends React.Component {
               placeholder="Category"
               description="category"
               className="form-control"
-              //value={this.state.category}
-              //onChange={this.changeCategoryHandler}
+              value={this.state.category}
+              onChange={this.changeCategoryHandler}
             />
           </div>
-          <button className="btn btn-success" onClick={this.saveCategory}>
-            Save
+          <button className="btn btn-success" onClick={this.deleteCategory}>
+            Delete
           </button>
           <button
             className="btn btn-danger"
-            //onClick={this.cancel.bind(this)}
+            onClick={this.cancel.bind(this)}
             style={{ marginLeft: "10px" }}
           >
             Cancel
@@ -275,6 +309,49 @@ class DeleteCategory extends React.Component {
 }
 
 class UpdateCategory extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: "",
+      newName: "",
+    };
+    this.changeCategoryTargetHandler =
+      this.changeCategoryTargetHandler.bind(this);
+    this.changeCategoryNameHandler = this.changeCategoryNameHandler.bind(this);
+    this.updateCategory = this.updateCategory.bind(this);
+  }
+
+  changeCategoryTargetHandler(event) {
+    this.setState({ name: event.target.value });
+  }
+
+  changeCategoryNameHandler(event) {
+    this.setState({ newName: event.target.value });
+  }
+
+  cancel() {
+    this.props.history.push("/UpdateCategory");
+  }
+
+  updateCategory = (e) => {
+    e.preventDefault();
+
+    this.props.allCategorys.forEach((category) => {
+      if (category.name.toLowerCase() === this.state.name.toLowerCase()) {
+        axios
+          .put(
+            "http://52.91.66.39:8080/Home/UpdateCategory/" +
+              category.categoryId +
+              "?newCategoryName=" +
+              this.state.newName
+          )
+          .then((res) => {
+            console.log(res);
+          });
+      }
+    });
+  };
+
   render() {
     return (
       <div className="updateCategoryform">
@@ -285,16 +362,24 @@ class UpdateCategory extends React.Component {
               placeholder="Category"
               description="category"
               className="form-control"
-              //value={this.state.category}
-              //onChange={this.changeCategoryHandler}
+              value={this.state.category}
+              onChange={this.changeCategoryTargetHandler}
+            />
+            <label>Please input the new Name of the Category</label>
+            <input
+              placeholder="New Name"
+              description="category"
+              className="form-control"
+              value={this.state.category}
+              onChange={this.changeCategoryNameHandler}
             />
           </div>
-          <button className="btn btn-success" onClick={this.saveCategory}>
+          <button className="btn btn-success" onClick={this.updateCategory}>
             Save
           </button>
           <button
             className="btn btn-danger"
-            //onClick={this.cancel.bind(this)}
+            onClick={this.cancel.bind(this)}
             style={{ marginLeft: "10px" }}
           >
             Cancel
@@ -334,6 +419,7 @@ class AdminOptions extends React.Component {
   }
 
   render() {
+    const categorys = this.props.categorys;
     const addCategoryClicked = this.state.addCategoryClicked;
     const updateCategoryClicked = this.state.updateCategoryClicked;
     const deleteCategoryClicked = this.state.deleteCategoryClicked;
@@ -346,11 +432,11 @@ class AdminOptions extends React.Component {
     }
 
     if (updateCategoryClicked) {
-      categoryUpdate = <UpdateCategory />;
+      categoryUpdate = <UpdateCategory allCategorys={categorys} />;
     }
 
     if (deleteCategoryClicked) {
-      categoryDelete = <DeleteCategory />;
+      categoryDelete = <DeleteCategory allCategorys={categorys} />;
     }
 
     return (
@@ -405,11 +491,11 @@ class MainPage extends React.Component {
   }
 
   componentDidMount() {
-    axios.get("http://100.24.41.32:8080/Home/AllCategorys").then((response) => {
+    axios.get("http://52.91.66.39:8080/Home/AllCategorys").then((response) => {
       this.setState({ categoryDataFromServer: response.data });
     });
 
-    axios.get("http://100.24.41.32:8080/Home/AllFilms").then((response) => {
+    axios.get("http://52.91.66.39:8080/Home/AllFilms").then((response) => {
       this.setState({ filmDataFromServer: response.data });
     });
   }
@@ -455,7 +541,9 @@ class MainPage extends React.Component {
     }
 
     if (adminClicked) {
-      adminOptions = <AdminOptions />;
+      adminOptions = (
+        <AdminOptions categorys={this.state.categoryDataFromServer} />
+      );
     }
 
     if (this.state.categoryDataFromServer.length !== 0) {
