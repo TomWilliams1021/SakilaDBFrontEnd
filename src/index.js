@@ -47,11 +47,11 @@ class FilmDetailsTable extends React.Component {
           </thead>
           <tbody>
             <tr id="filmTableActorsHeader" colSpan="2" scope="colgroup">
-              Actors
+              <td>Actors</td>
             </tr>
             {actorRows}
             <tr id="filmTableActorsHeader" colSpan="2" scope="colgroup">
-              Other Information
+              <td>Other Information</td>
             </tr>
             <tr>
               <td>Length</td>
@@ -110,7 +110,7 @@ class FilmsTable extends React.Component {
           filmRows.push(
             <FilmRow
               film={film}
-              key={film.filmId + film.title}
+              key={film.filmId}
               onClick={() => this.props.onClick(film)}
             />
           );
