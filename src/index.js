@@ -198,7 +198,7 @@ class AddCategory extends React.Component {
     console.log("category => " + JSON.stringify(name));
 
     axios
-      .post("http://52.91.66.39:8080/Home/AddCategory?name=" + this.state.name)
+      .post("http://23.20.53.59:8080/Home/AddCategory?name=" + this.state.name)
       .then((res) => {
         console.log(res);
       });
@@ -267,7 +267,7 @@ class DeleteCategory extends React.Component {
       if (category.name.toLowerCase() === this.state.name.toLowerCase()) {
         axios
           .delete(
-            "http://52.91.66.39:8080/Home/DeleteCategory/" + category.categoryId
+            "http://23.20.53.59:8080/Home/DeleteCategory/" + category.categoryId
           )
           .then((res) => {
             console.log(res);
@@ -340,7 +340,7 @@ class UpdateCategory extends React.Component {
       if (category.name.toLowerCase() === this.state.name.toLowerCase()) {
         axios
           .put(
-            "http://52.91.66.39:8080/Home/UpdateCategory/" +
+            "http://23.20.53.59:8080/Home/UpdateCategory/" +
               category.categoryId +
               "?newCategoryName=" +
               this.state.newName
@@ -491,11 +491,11 @@ class MainPage extends React.Component {
   }
 
   componentDidMount() {
-    axios.get("http://52.91.66.39:8080/Home/AllCategorys").then((response) => {
+    axios.get("http://23.20.53.59:8080/Home/AllCategorys").then((response) => {
       this.setState({ categoryDataFromServer: response.data });
     });
 
-    axios.get("http://52.91.66.39:8080/Home/AllFilms").then((response) => {
+    axios.get("http://23.20.53.59:8080/Home/AllFilms").then((response) => {
       this.setState({ filmDataFromServer: response.data });
     });
   }
